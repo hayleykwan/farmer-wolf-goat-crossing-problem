@@ -10,8 +10,6 @@
 
 %% ------------  (utilities) DO NOT EDIT
 
-
-
 forall(P,Q) :- \+ (P, \+ Q).
 
 
@@ -111,44 +109,19 @@ select_acc(X, [H|T], Remainder, Acc) :-
 
 
 
-%% ----- STEP 7 -----   %%%%%%%%
+%% ----- STEP 7 -----
 
-%from north to south
+crossing([f|North]-South, f, North-[f|South]).
 
-crossing(North-South, Move, Next) :-
-  member(f, North),
-  select(f, North, Remainder),
-  Move = f, 
-  Next = Remainder-[f|South].
+crossing(North-[f|South], f, [f|North]-South).
 
-crossing(North-South, Move, Next) :-
-  member(f, North),
-  select(f, North, Remainder),
-  member(X, Remainder),
-  X \= f,
-  Move = f+X, 
-  select(X, Remainder, New_Rem),
-  New_South = [X|South],
-  Next = New_Rem-[f|New_South].
+crossing([f|N1]-South, f+X, N2-[f,X | South]):-
+  member(X, N1),
+  select(X, N1, N2).
 
-
-% from south to north
-
-crossing(North-South, Move, Next) :-
-  member(f, South),
-  Move = f,
-  select(f, South, Remainder),
-  Next = [f|North]-Remainder.
-
-crossing(North-South, Move, Next) :-
-  member(f, South),
-  select(f, South, Remainder),
-  member(X, Remainder),
-  X \= f,
-  Move = f+X, 
-  select(X, Remainder, New_Rem),
-  New_North = [X|North],
-  Next = [f|New_North]-New_Rem.
+crossing(North-[f|S1], f+X, [f,X|North]-S2):-
+  member(X, S1),
+  select(X, S1, S2).
 
 
 
@@ -186,7 +159,7 @@ count_items_acc([H|T], Acc, Stats) :-
 count_items_acc([H|T], Acc, Stats) :-
   append(HeadAcc, [(H, OldCount) | TailAcc] , Acc),
   append(HeadAcc, [(H, N) | TailAcc], A),
-  N is (OldCount+1),
+  N is OldCount+1,
   count_items_acc(T, A, Stats).
 
 
@@ -198,3 +171,4 @@ g_journeys(Seq, N) :-
   succeeds(Seq),
   count_items(Seq, Stats),
   member((f+g, N), Stats).
+
